@@ -1,5 +1,7 @@
 import { io } from 'socket.io-client'
 
-export const socket = io('http://localhost:5050', {
+import { SERVER_URL } from './constants'
+
+export const socket = io(SERVER_URL, {
   withCredentials: true,
 })
