@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-
-import { socket } from '../socket'
 import axios from 'axios'
+import { socket } from '../socket'
 import { useDispatch, useSelector } from 'react-redux'
-import { setUser } from '../redux/actions'
+
+import { setIsAuth, setUser, setUsers } from '../redux/actions'
+import { SERVER_URL } from '../constants'
 
 export const LoginForm = () => {
   const [roomId, setRoomId] = useState('')
@@ -11,13 +12,15 @@ export const LoginForm = () => {
 
   const dispatch = useDispatch()
 
-  const store = useSelector((store) => store)
+  const store = useSelector((store) => store.user)
   console.log(`=>store`, store)
 
   const handleChangeRoomId = (event) => {
     setRoomId(event.target.value)
   }
-
+  const onLogin = () => {
+    dispatch(setIsAuth(true))
+  }
   const handleChangeUserName = (event) => {
     setUserName(event.target.value)
   }
@@ -29,15 +32,23 @@ export const LoginForm = () => {
     }
     dispatch(setUser(obj))
 
-    console.log('=>obj', obj)
+    console.log('=>submitObj', obj)
+    onLogin()
+
+    // SERVER_URL
     await axios.post('http://localhost:5050/rooms', obj)
     socket.emit('ROOM:JOIN', obj)
+    // const { data } = await axios.get(`/rooms/${obj.roomId}`)
+    // console.log(`=>data`, data)
+    // setSocketUsers(data.users)
+  }
+  const setSocketUsers = (users) => {
+    dispatch(setUsers(users))
+    console.log(`=>ROOM:SET_USERS`, users)
   }
 
   useEffect(() => {
-    socket.on('ROOM:JOINED', (users) => {
-      console.log(`=>New user`, users)
-    })
+    socket.on('ROOM:SET_USERS', setSocketUsers)
   }, [])
 
   return (
