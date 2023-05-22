@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { socket } from '../socket'
-import { useDispatch, useSelector } from 'react-redux'
 
-import { setIsAuth, setUser, setUsers } from '../redux/actions'
+import { setIsAuth, setUser, setUsers, waitUser } from '../redux/actions'
+import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { SERVER_URL } from '../constants'
 
 export const LoginForm = () => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const store = useSelector((store) => store.user)
+  const store = useAppSelector((store) => store.user)
   console.log(`=>store`, store)
 
   const handleChangeRoomId = (event) => {
@@ -26,10 +26,13 @@ export const LoginForm = () => {
   }
 
   const handleSubmit = async () => {
+    dispatch(waitUser())
+
     const obj = {
       roomId,
       userName,
     }
+
     dispatch(setUser(obj))
 
     console.log('=>submitObj', obj)
@@ -42,6 +45,7 @@ export const LoginForm = () => {
     // console.log(`=>data`, data)
     // setSocketUsers(data.users)
   }
+
   const setSocketUsers = (users) => {
     dispatch(setUsers(users))
     console.log(`=>ROOM:SET_USERS`, users)
@@ -65,7 +69,9 @@ export const LoginForm = () => {
         value={userName}
         onChange={handleChangeUserName}
       />
-      <button onClick={handleSubmit}>Войти</button>
+      <button disabled={store.isLoading} onClick={handleSubmit}>
+        {store.isLoading ? 'Вход...' : 'Войти'}
+      </button>
     </>
   )
 }

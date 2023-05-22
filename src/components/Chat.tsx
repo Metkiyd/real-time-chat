@@ -1,9 +1,12 @@
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from '../redux/hooks'
 
-const Chat = () => {
-  const { users } = useSelector((store) => store.user)
-  console.log(`=>storeInChat`, users)
+export const Chat = () => {
+  const store = useAppSelector((store) => store.user)
+  console.log(`=>storeInChat`, store)
+
+  const { users } = useAppSelector((store) => store.user)
+  console.log(`=>usersStateInChat`, users)
   const [message, setMessage] = useState('')
   return (
     <div>
@@ -37,5 +40,3 @@ const Chat = () => {
     </div>
   )
 }
-
-export default Chat
